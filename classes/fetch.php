@@ -18,6 +18,19 @@ class eabWhois
 		);
 	}
 
+	public function clearCache( $domain = '' )
+	{
+		if ( $domain ) {
+			$cacheFileHandler = eZClusterFileHandler::instance( $this->cacheSettings['path'] . $domain . '.php' );
+
+			if ( $cacheFileHandler->fileExists( $cacheFileHandler->filePath )) {
+				$cacheFileHandler->fileDelete( $cacheFileHandler->filePath );
+				eZDebug::writeDebug( 'Deleted "' . $domain . '"entry from cache.', 'EAB Whois' );
+				eZLog::write ( 'Deleted "' . $domain . '" entry from cache.', 'whois.log');
+			}
+		}
+	}
+
 	public function getInfo( $domain = '' )
 	{
 		$cacheFileHandler = eZClusterFileHandler::instance( $this->cacheSettings['path'] . $domain . '.php' );
@@ -29,7 +42,7 @@ class eabWhois
 				eZLog::write ( 'Looking up "' . $domain . '".', 'whois.log');
 
 				$info = ezjscServerFunctionsWhois::info( array( $domain ));
-	
+
 				$cacheFileHandler->fileStoreContents( $cacheFileHandler->filePath, serialize( $info ) );
 			}
 			else
