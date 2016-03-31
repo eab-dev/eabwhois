@@ -59,13 +59,12 @@ class ezjscServerFunctionsWhois extends ezjscServerFunctions
 		$Parser->setDateFormat( '%d/%m/%Y' );
 		$result = $Parser->lookup( $domain );
 
-		$owners = $result->contacts->owner;
 		$domainOwner = "";
 		$ownerAddress = array();
 
-		if (isset( $owners))
+		if (isset( $result->contacts->owner ))
 		{
-			foreach ($owners as $owner)
+			foreach ( $result->contacts->owner as $owner )
 			{
 				$domainOwner = $owner->name;
 				if ($owner->organization) $ownerAddress[] = $owner->organization;
@@ -96,10 +95,13 @@ class ezjscServerFunctionsWhois extends ezjscServerFunctions
 
 		if ( preg_match( '/^Template (.+) could not be found./', $warning ) || !$result->expires || !$registrarName )
 		{
-			$warning .= "<pre>";
-			foreach ($result->rawdata as $line)
-				$warning .= $line . "<br />";
-			$warning .= "</pre>";
+			if ( $result->rawdata )
+			{
+				$warning .= "<pre>";
+				foreach ( $result->rawdata as $line )
+					$warning .= $line . "<br />";
+				$warning .= "</pre>";
+			}
 		}
 		
 		return array(
@@ -119,7 +121,7 @@ class ezjscServerFunctionsWhois extends ezjscServerFunctions
 		return $data;
 	}
 
-	public function validDomain( $domainName )
+	public static function validDomain( $domainName )
 	{
 		return (preg_match( "/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $domainName ));
 	}
