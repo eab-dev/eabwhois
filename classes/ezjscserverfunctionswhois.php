@@ -108,7 +108,7 @@ class ezjscServerFunctionsWhois extends ezjscServerFunctions
 					'expiry_date' => $result->expires,
 					'registrar' => $registrarName,
 					'owner' => $domainOwner,
-					'address' => implode( $ownerAddress, "," ),
+					'address' => self::implodeRecursively( $ownerAddress, "," ),
 					'warning' => $warning
 				);
 	}
@@ -126,6 +126,21 @@ class ezjscServerFunctionsWhois extends ezjscServerFunctions
 		return (preg_match( "/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $domainName ));
 	}
 
+	static function implodeRecursively( array $array, $glue )
+	{
+		$result = '';
+		foreach( $array as $element ) {
+			if ( $result != '' ) {
+                            $result .= $glue;
+                        }
+			if ( is_array( $element ) ) {
+				$result .= self::implodeRecursively( $element, $glue );
+			} else {
+				$result .= $element;
+			}
+		}
+		return $result;
+	}
 }
 
 ?>
